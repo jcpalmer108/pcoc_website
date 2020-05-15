@@ -1,0 +1,17 @@
+{
+  "name": "pcoc_token_app",
+  "version": "1.0.0",
+  "description": "app that grabs token from youtube",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jenna Palmer",
+  "license": "ISC",
+  "dependencies": {
+    "brew": "0.0.8",
+    "express": "^4.17.1",
+    "homebrew": "^0.1.0",
+    "node-fetch": "^2.6.0"
+  }
+}

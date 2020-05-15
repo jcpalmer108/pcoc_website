@@ -1,0 +1,7 @@
+{
+    "credentials": {
+        "client_id": "381180144163-r1k277fj8ir0v6r90nfgunn9eblflmnr.apps.googleusercontent.com",
+        "client_secret": "q2_cxnbuC7eEZ4n1M296sAip"
+    },
+    "scope": "https://www.googleapis.com/auth/youtube.readonly"
+}

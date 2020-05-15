@@ -1,0 +1,248 @@
+<script>
+  // global variables
+  const threeSecondDelay = 3000;
+  const fiveSecondDelay = 5000;
+  const fiveMinDelay = 300000;
+
+  /*
+  *
+  * Function onInitialize
+  * @desc - main function that executes after page is initialized
+  *
+  */
+  window.Squarespace.onInitialize(Y, async function(){
+    var initTime = new Date();
+    await renderBanner(initTime, true);
+
+    if(!ifStreaming()) {
+      const interval = setInterval(async function() {
+        if(new Date().getTime() - initTime > fiveMinDelay) {
+          clearInterval(interval);
+          return;
+        }
+
+        await renderBanner(initTime, false, function () {
+            clearInterval(interval);
+          });
+              
+      }, fiveSecondDelay);
+    }
+
+    
+
+  });
+
+  /*
+  *
+  * Function renderBanner
+  * @desc - manages the removing of the spinner to page's main button
+  * @params - show (boolean)
+  *
+  */
+  async function renderBanner (initTime, withSpinner, callback = () => {}) {
+    console.log('rendering banner');
+    if(withSpinner) { showSpinner(true); }
+
+    const isStreaming = await ifStreaming();
+    const isMobile = isMobileDevice();
+    console.log('isStreaming: ', isStreaming);
+    console.log('isMobile: ', isMobile);
+
+
+    if(isStreaming && !isMobile) {
+      descWrapperTheaterMode();
+      window.dispatchEvent(new Event('resize'));
+      callback();
+    } else if (isStreaming && isMobile) {
+      descWrapperLiveNow(initTime);
+      callback();
+    } else if (!isStreaming && withSpinner) {
+      descWrapperWatchNow(initTime);
+    } 
+  }
+
+  /*
+  *
+  * Function descWrapperWatchNow
+  * @desc - manages the removing of the spinner to page's main button
+  * @params - show (boolean)
+  *
+  */
+  function descWrapperTheaterMode () {
+    // create overlay and iframe elements
+    var ifrm = document.createElement("div");
+    ifrm.setAttribute("class", "theater-iframe-background");
+    ifrm.innerHTML = "<iframe src='https://www.youtube.com/embed/live_stream?channel=UCAXkKLwHrwQQ_uAzmpzyPZw&autoplay=1' width='100%' height='600px' frameborder='0' allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture' allowfullscreen></iframe>";
+    var colorOverlay = document.createElement("div");
+    colorOverlay.setAttribute("id", "theater-overlay");
+
+    // remove descWrapper content
+    const descWrapper = document.body.getElementsByClassName("desc-wrapper")[0];
+    descWrapper.innerHTML = '';
+
+    // add theater classes to descWrapper
+    descWrapper.className += ' streaming-view';
+    document.body.getElementsByClassName("banner-thumbnail-wrapper")[0].className += " streaming-wrapper"
+
+    // add the iframe and cover overlay
+    descWrapper.appendChild(ifrm);
+    descWrapper.appendChild(colorOverlay);
+  }
+
+
+  /*
+  *
+  * Function descWrapperLiveNow
+  * @desc - manages the displaying of the spinner
+  * @params - show (boolean)
+  *
+  */
+  function descWrapperLiveNow (startTime) {
+    const difference =  new Date() - startTime;
+
+    if (difference < threeSecondDelay) {
+      setTimeout(function () { 
+        findSpinnerAddLiveNow();
+        }, (threeSecondDelay - difference));
+    } else {
+      findSpinnerAddLiveNow();
+    }
+  }
+
+  /*
+  *
+  * Function descWrapperWatchNow
+  * @desc - manages the removing of the spinner to page's main button
+  * @params - show (boolean)
+  *
+  */
+  function descWrapperWatchNow (startTime) {
+    const difference =  new Date() - startTime;
+
+    if (difference < threeSecondDelay) {
+      setTimeout(function () { 
+        showSpinner(false);
+        }, (threeSecondDelay - difference));
+    } else {
+      showSpinner(false);
+    }
+  }
+
+
+
+  /*
+  *
+  * Function findSpinnerAddLiveNow
+  * @desc - finds spinner element and adds live now child
+  *
+  */
+  function findSpinnerAddLiveNow () {
+    var liveNow = document.createElement("div");
+    liveNow.className += " spinner live-now-button";
+    liveNow.innerHTML = 'live now<div class="bounce1" />';
+
+    removeSpinnerElement().appendChild(liveNow);
+  }
+
+  /*
+  *
+  * Function removeSpinnerElement
+  * @desc - find spinner element and reset it
+  * @returns - DOM Element
+  *
+  */
+  function removeSpinnerElement () {
+    const spinner = document.body.getElementsByClassName("spinner")[0].parentElement.parentElement;
+    spinner.innerHTML = '';
+    return spinner;
+  }
+
+  /*
+  *
+  * Function showSpinner
+  * @desc - manages the displaying of the spinner
+  * @params - show (boolean)
+  *
+  */
+  function showSpinner (show) {
+    // create watch now and spinner element
+    var spinner = document.createElement("div");
+    spinner.innerHTML = '<div class="spinner"><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div></div>';
+    var watchNow = document.createTextNode("Watch Now");
+
+    var button;
+
+    if(show) {
+      index = findWithAttr(document.body.getElementsByTagName("a"), "innerHTML", "Watch Now");
+      button = document.body.getElementsByTagName("a")[index];
+      button.innerHTML = '';
+      button.appendChild(spinner);
+    } else {
+      button = document.body.getElementsByClassName("spinner")[0].parentElement.parentElement;
+      console.log(button.innerHTML);
+      button.innerHTML = '';
+      button.appendChild(watchNow);
+    }
+
+  }
+
+  /*
+  *
+  * Function isMobileDevice
+  * @desc - identifies if user is on mobile device
+  * @params - none
+  * @returns - boolean
+  *
+  */
+  function isMobileDevice () {
+    if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+      return true;
+    }
+    return false;
+  }
+
+  /*
+  *
+  * Function findWithAttribute
+  * @desc - finds object in array by attribute
+  * @params - array (array), attribute (string), value (string)
+  * @returns - Integer (index or -1)
+  *
+  */
+  function findWithAttr(array, attr, value) {
+    for(var i = 0; i < array.length; i += 1) {
+      const item = array[i][attr];
+      if(item.includes(value)) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+
+  /*
+  *
+  * Function ifStreaming
+  * @desc - identifies if there is a live stream happening
+  * @returns - Boolean
+  *
+  */    
+  async function ifStreaming () {
+    const info = await getStreamInfo();
+    return info ? info.pageInfo.totalResults > 0 : false;
+  }
+
+  /*
+  *
+  * Function getStreamInfo
+  * @desc - makes API call to Youtube to see if live streams are online
+  * @returns - Object (json object response)
+  *
+  */    
+  async function getStreamInfo () {
+    var response = await fetch('https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCAXkKLwHrwQQ_uAzmpzyPZw&type=video&eventType=live&key=AIzaSyDxhQE63b3D_dqUvrAH6_11ZHwtvo8akSE');
+    var data = await response.json();
+    return data;
+  }
+      
+</script>
