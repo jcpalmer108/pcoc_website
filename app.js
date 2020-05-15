@@ -12,14 +12,14 @@ var activeSessionData = {};
 
 app.get('/', (req, res) => res.send(`${temp.words}`));
 
-app.get('/device-code', async (req, res) => {
+app.get('/device-code', async function (req, res) {
   activeSessionData = {};
 
   await getYoutubeDeviceCode();  
   res.send(`<h1>${activeSessionData.device.user_code}</h1><br><br><a href='https://www.google.com/device' target=_blank>https://www.google.com/device</a>`);
 })
 
-app.get('/start-token', async (req, res) => {
+app.get('/start-token', async function (req, res) {
   var response;
 
   if(activeSessionData && activeSessionData.device && activeSessionData.device.device_code) {
