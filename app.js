@@ -86,7 +86,7 @@ app.get('/start-token', async function (req, res) {
   }
 
   res.send(response);
-})
+});
 
 app.get('/get-token', async (req, res) => {
   if(activeSessionData && activeSessionData.token && activeSessionData.token.access_token !== undefined) {
@@ -97,7 +97,7 @@ app.get('/get-token', async (req, res) => {
       message: 'Need to get Device Code and Start Token before retrieving tokens'
     });
   }
-})
+});
 
 app.get('/force-refresh', async (req, res) => {
   if (activeSessionData && activeSessionData.token && activeSessionData.token.access_token !== undefined) {
@@ -109,10 +109,9 @@ app.get('/force-refresh', async (req, res) => {
       message: 'Need to get Device Code and Start Token before refreshing tokens'
     });
   }
-})
+});
 
-
-app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
+app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
 
 
 /*
