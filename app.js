@@ -9,17 +9,47 @@ global.Headers = fetch.Headers;
 
 var activeSessionData = {};
 
+app.get('/device-code', async () => await generateDeviceCodeEndpoint());
 
-app.get('/', (req, res) => res.send(`${temp.words}`));
+app.get('/start-token', async () => await generateStartTokenEndpoint());
 
-app.get('/device-code', async function (req, res) {
+app.get('/get-token', async () => await generateGetTokenEndpoint());
+
+app.get('/force-refresh', async () => await generateForceRefreshEndpoint());
+
+app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
+
+async function generateForceRefreshEndpoint (req, res) {
+  if (activeSessionData && activeSessionData.token && activeSessionData.token.access_token !== undefined) {
+    await refreshYoutubeAccessToken();  
+    res.send(activeSessionData.token);
+  } else {
+    res.send({
+      error: 'needs_initiation',
+      message: 'Need to get Device Code and Start Token before refreshing tokens'
+    });
+  }
+}
+
+async function generateGetTokenEndpoint (req, res) {
+  if(activeSessionData && activeSessionData.token && activeSessionData.token.access_token !== undefined) {
+    res.send(activeSessionData.token);
+  } else {
+    res.send({
+      error: 'needs_initiation',
+      message: 'Need to get Device Code and Start Token before retrieving tokens'
+    });
+  }
+}
+
+
+async function generateDeviceCodeEndpoint (req, res) {
   activeSessionData = {};
-
   await getYoutubeDeviceCode();  
   res.send(`<h1>${activeSessionData.device.user_code}</h1><br><br><a href='https://www.google.com/device' target=_blank>https://www.google.com/device</a>`);
-})
+}
 
-app.get('/start-token', async function (req, res) {
+async function generateStartTokenEndpoint (req, res) {
   var response;
 
   if(activeSessionData && activeSessionData.device && activeSessionData.device.device_code) {
@@ -86,32 +116,7 @@ app.get('/start-token', async function (req, res) {
   }
 
   res.send(response);
-});
-
-app.get('/get-token', async (req, res) => {
-  if(activeSessionData && activeSessionData.token && activeSessionData.token.access_token !== undefined) {
-    res.send(activeSessionData.token);
-  } else {
-    res.send({
-      error: 'needs_initiation',
-      message: 'Need to get Device Code and Start Token before retrieving tokens'
-    });
-  }
-});
-
-app.get('/force-refresh', async (req, res) => {
-  if (activeSessionData && activeSessionData.token && activeSessionData.token.access_token !== undefined) {
-    await refreshYoutubeAccessToken();  
-    res.send(activeSessionData.token);
-  } else {
-    res.send({
-      error: 'needs_initiation',
-      message: 'Need to get Device Code and Start Token before refreshing tokens'
-    });
-  }
-});
-
-app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
+}
 
 
 /*
