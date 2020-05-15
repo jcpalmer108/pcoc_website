@@ -1,16 +1,16 @@
-const settings = require('./settings.json')
-const express = require('express')
-const app = express()
-const port = 3000
+const settings = require('./settings.json');
+const express = require('express');
+const app = express();
+const port = 3000;
 
 const fetch = require('node-fetch');
-global.fetch = fetch
+global.fetch = fetch;
 global.Headers = fetch.Headers;
 
 var activeSessionData = {};
 
 
-app.get('/', (req, res) => res.send(`${temp.words}`))
+app.get('/', (req, res) => res.send(`${temp.words}`));
 
 app.get('/device-code', async (req, res) => {
   activeSessionData = {};
