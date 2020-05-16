@@ -1,3 +1,20 @@
+/*
+* Created on May 15th, 2020
+*
+* PURPOSE:
+* Express application that utilizes the Youtube API Limited Input Authentication
+* Flow in order to save the access token that https://www.portlandchurch.org
+* can call whenever the home page is loaded
+*
+* RESOURCES:
+*   - Youtube API Oauth for Limited Inputs Docs - https://developers.google.com/youtube/v3/guides/auth/devices
+*       Note: Documentation for the device_code and token endpoints called in this Express App
+*   - Youtube API Livebroadcast:List Docs - https://developers.google.com/youtube/v3/live/docs/liveBroadcasts/list
+*       Note: The endpoint Squarespace will call with the retrieved access token from this Express App
+*
+* Copyright (c) 2020 - Jenna Palmer Applications
+*/
+
 const settings = require('./settings.json');
 const express = require('express');
 const app = express();
@@ -8,6 +25,15 @@ global.fetch = fetch;
 global.Headers = fetch.Headers;
 
 var activeSessionData = {};
+
+/*
+*
+* Endpoint /device-code
+* @desc - displays the code required by the user to enter the device code approval
+*   Oauth process (https://www.google.com/device)
+* @returns - Void
+*
+*/
 
 app.get('/device-code', async () => await generateDeviceCodeEndpoint());
 
