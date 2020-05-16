@@ -6,7 +6,7 @@ The following express application is to be utilized by the squarespace website h
 
 ## Deployment
 
-To run the application, run the following code: 
+To run the application, run the following code in the root directory: 
 ```
 node app.js
 ```
