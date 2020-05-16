@@ -27,14 +27,10 @@ global.Headers = fetch.Headers;
 var activeSessionData = {};
 
 /*
-*
-* Endpoint /device-code
-* @desc - displays the code required by the user to enter the device code approval
-*   Oauth process (https://www.google.com/device)
-* @returns - Void
-*
+========================================================================================================
+END POINTS
+========================================================================================================
 */
-
 app.get('/device-code', async () => await generateDeviceCodeEndpoint());
 
 app.get('/start-token', async () => await generateStartTokenEndpoint());
@@ -45,42 +41,44 @@ app.get('/force-refresh', async () => await generateForceRefreshEndpoint());
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
 
-async function generateForceRefreshEndpoint (req, res) {
-  if (activeSessionData && activeSessionData.token && activeSessionData.token.access_token !== undefined) {
-    await refreshYoutubeAccessToken();  
-    res.send(activeSessionData.token);
-  } else {
-    res.send({
-      error: 'needs_initiation',
-      message: 'Need to get Device Code and Start Token before refreshing tokens'
-    });
-  }
-}
+/*
+========================================================================================================
+MAIN FUNCTIONS
+========================================================================================================
+*/
 
-async function generateGetTokenEndpoint (req, res) {
-  if(activeSessionData && activeSessionData.token && activeSessionData.token.access_token !== undefined) {
-    res.send(activeSessionData.token);
-  } else {
-    res.send({
-      error: 'needs_initiation',
-      message: 'Need to get Device Code and Start Token before retrieving tokens'
-    });
-  }
-}
-
-
+/*
+* function generateDeviceCodeEndpoint
+* @desc - displays the code required by the user to enter the device code approval 
+*         Oauth process (https://www.google.com/device)
+* @returns Void
+*/
 async function generateDeviceCodeEndpoint (req, res) {
   activeSessionData = {};
   await getYoutubeDeviceCode();  
   res.send(`<h1>${activeSessionData.device.user_code}</h1><br><br><a href='https://www.google.com/device' target=_blank>https://www.google.com/device</a>`);
 }
 
+
+/*
+* function generateStartTokenEndpoint
+* @desc - Uses the saved device_code generated from the previous call to retrieve the first working
+*         access token; Timer starts to countdown the lifetime of this access_token's functionality
+*         then automatically calls the refresh_token function to update the token
+* @returns Void
+*/
 async function generateStartTokenEndpoint (req, res) {
   var response;
 
+  // if there is a device_code saved (if the /device-code endpoint has been called)
+  //    then proceed with the token generating
+  //    else throw error prompting user to call /device-code endpoint
   if(activeSessionData && activeSessionData.device && activeSessionData.device.device_code) {
     var cached = {};
 
+    // if this endpoint has already been called, cache the current activeSession data
+    //    so that the user sees an error that this code has already been exchanced (from the Youtube API)
+    //    however, the /get-token endpoint will still return an active access_token
     if(activeSessionData && activeSessionData.token && activeSessionData.token.access_token && typeof(activeSessionData.token.access_token) === "string" ) {
       cached = activeSessionData.token;
     }
@@ -144,6 +142,50 @@ async function generateStartTokenEndpoint (req, res) {
   res.send(response);
 }
 
+/*
+*
+* Function generateGetTokenEndpoint
+* @desc - Retrieve the currently stored access token
+* @returns Void
+*
+*/
+async function generateGetTokenEndpoint (req, res) {
+  if(activeSessionData && activeSessionData.token && activeSessionData.token.access_token !== undefined) {
+    res.send(activeSessionData.token);
+  } else {
+    res.send({
+      error: 'needs_initiation',
+      message: 'Need to get Device Code and Start Token before retrieving tokens'
+    });
+  }
+}
+
+/*
+*
+* Function generateForceRefreshEndpoint
+* @desc - Forces the refreshing of a currently active access token and saves that information; 
+*         also sets a timer for the lifetime of that token & automatically refreshes that token
+*         when its lifetime is expired
+* @returns Void
+*
+*/
+async function generateForceRefreshEndpoint (req, res) {
+  if (activeSessionData && activeSessionData.token && activeSessionData.token.access_token !== undefined) {
+    await refreshYoutubeAccessToken();  
+    res.send(activeSessionData.token);
+  } else {
+    res.send({
+      error: 'needs_initiation',
+      message: 'Need to get Device Code and Start Token before refreshing tokens'
+    });
+  }
+}
+
+/*
+========================================================================================================
+HELPER FUNCTIONS
+========================================================================================================
+*/
 
 /*
 *
@@ -170,6 +212,7 @@ async function getYoutubeDeviceCode () {
   await fetch("https://oauth2.googleapis.com/device/code", requestOptions)
     .then(response => response.json())
     .then(result => {
+      // sets the data retrieved from endpoint to activeSessionData.device 
       activeSessionData['device'] = result;
     })
     .catch(error => console.log('error', error));  
@@ -192,6 +235,7 @@ async function setYoutubeAccessToken () {
     await fetch(`https://oauth2.googleapis.com/token?client_id=${settings.credentials.client_id}&client_secret=${settings.credentials.client_secret}&device_code=${activeSessionData.device.device_code}&grant_type=urn:ietf:params:oauth:grant-type:device_code`, requestOptions)
     .then(response => response.json())  
     .then(result => {
+        // sets the data retrieved from endpoint to activeSessionData.token 
         activeSessionData['token'] = result;
       })
       .catch(error => {
