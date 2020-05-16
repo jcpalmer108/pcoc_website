@@ -1,4 +1,4 @@
-# Project Title
+# PCOC Access Token Retreival API
 
 The following express application is to be utilized by the squarespace website https://www.portlandchurch.org in order to provide the website with an active access_token, for the jcpalmer108 Youtube account, in order to properly query youtube to get information on whether or not it is currently live. 
 
