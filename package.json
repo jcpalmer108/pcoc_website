@@ -4,7 +4,7 @@
   "description": "app that grabs token from youtube",
   "main": "index.js",
   "scripts": {
-    "start": "pm2 app.js",
+    "start": "pm2 start app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Jenna Palmer",
