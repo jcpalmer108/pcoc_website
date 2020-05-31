@@ -33,13 +33,13 @@ END POINTS
 */
 app.get('/', () => console.log('This is working'));
 
-app.get('/device-code', async () => await generateDeviceCodeEndpoint());
+app.get('/device-code', async (req, res) => await generateDeviceCodeEndpoint(req, res));
 
-app.get('/start-token', async () => await generateStartTokenEndpoint());
+app.get('/start-token', async (req, res) => await generateStartTokenEndpoint(req, res));
 
-app.get('/get-token', async () => await generateGetTokenEndpoint());
+app.get('/get-token', async (req, res) => await generateGetTokenEndpoint(req, res));
 
-app.get('/force-refresh', async () => await generateForceRefreshEndpoint());
+app.get('/force-refresh', async (req, res) => await generateForceRefreshEndpoint(req, res));
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
 
@@ -56,15 +56,9 @@ MAIN FUNCTIONS
 * @returns Void
 */
 async function generateDeviceCodeEndpoint (req, res) {
-  console.log('q:', req, 'r:', res);
-
-  try {
-    activeSessionData = {};
-    await getYoutubeDeviceCode();  
-    res.send(`<h1>${activeSessionData.device.user_code}</h1><br><br><a href='https://www.google.com/device' target=_blank>https://www.google.com/device</a>`);  
-  } catch (err) {
-    console.log(err);
-  }
+  activeSessionData = {};
+  await getYoutubeDeviceCode();  
+  res.send(`<h1>${activeSessionData.device.user_code}</h1><br><br><a href='https://www.google.com/device' target=_blank>https://www.google.com/device</a>`);  
 }
 
 
