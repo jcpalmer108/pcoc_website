@@ -31,6 +31,8 @@ var activeSessionData = {};
 END POINTS
 ========================================================================================================
 */
+app.get('/device-code', () => console.log('This is working'));
+
 app.get('/device-code', async () => await generateDeviceCodeEndpoint());
 
 app.get('/start-token', async () => await generateStartTokenEndpoint());
