@@ -54,9 +54,15 @@ MAIN FUNCTIONS
 * @returns Void
 */
 async function generateDeviceCodeEndpoint (req, res) {
-  activeSessionData = {};
-  await getYoutubeDeviceCode();  
-  res.send(`<h1>${activeSessionData.device.user_code}</h1><br><br><a href='https://www.google.com/device' target=_blank>https://www.google.com/device</a>`);
+  console.log('q:', req, 'r:', res);
+
+  try {
+    activeSessionData = {};
+    await getYoutubeDeviceCode();  
+    res.send(`<h1>${activeSessionData.device.user_code}</h1><br><br><a href='https://www.google.com/device' target=_blank>https://www.google.com/device</a>`);  
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 
