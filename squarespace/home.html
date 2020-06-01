@@ -241,17 +241,13 @@
   */    
   async function getAccessToken () {
     try {
-      var requestOptions = {
-        method: 'GET',
-        redirect: 'follow'
-      };
+      fetch('http://3.135.247.69/get-token')
+        .then(response => response.json())
+        .then(data => {
+          console.log(data);
+          return data;
+        });
 
-      fetch("https://3.135.247.69/get-token", requestOptions)
-        .then(response => response.text())
-        .then(result => {
-          return result;
-        })
-        .catch(error => console.log('error', error));
     } catch (err) {
       console.log(err);
     }
