@@ -219,7 +219,6 @@
     return -1;
   }
 
-
   /*
   *
   * Function ifStreaming
@@ -229,7 +228,36 @@
   */    
   async function ifStreaming () {
     const info = await getStreamInfo();
+    console.log('info:', info);
     return info ? info.pageInfo.totalResults > 0 : false;
+  }
+
+  /*
+  *
+  * Function getAccessToken
+  * @desc - gets a youtube access_token used to make oauth approved api calls
+  * @returns - Object (json object response)
+  *
+  */    
+  async function getAccessToken () {
+    try {
+      var requestOptions = {
+        method: 'GET',
+        redirect: 'follow'
+      };
+
+      fetch("https://3.135.247.69/get-token", requestOptions)
+        .then(response => response.text())
+        .then(result => {
+          return result;
+        })
+        .catch(error => console.log('error', error));
+    } catch (err) {
+      console.log(err);
+    }
+    // var response = await fetch('https://3.135.247.69/get-token');
+    // var data = await response.json();
+    // return data;
   }
 
   /*
@@ -240,6 +268,21 @@
   *
   */    
   async function getStreamInfo () {
+    await getAccessToken().then(async (tokenInfo) => {
+      var response = await fetch(`https://www.googleapis.com/youtube/v3/liveBroadcasts?part=id%2Csnippet%2CcontentDetails%2Cstatus&broadcastStatus=active&access_token=${tokenInfo.access_token}`);
+      var data = await response.json();
+      return data;
+    });
+  }
+
+  /*
+  *
+  * Function getLegacyStreamInfo
+  * @desc - makes API call to Youtube to see if live streams are online
+  * @returns - Object (json object response)
+  *
+  */    
+  async function getLegacyStreamInfo () {
     var response = await fetch('https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCAXkKLwHrwQQ_uAzmpzyPZw&type=video&eventType=live&key=AIzaSyDxhQE63b3D_dqUvrAH6_11ZHwtvo8akSE');
     var data = await response.json();
     return data;
