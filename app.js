@@ -57,6 +57,13 @@ app.get('/force-refresh', async (req, res) => await generateForceRefreshEndpoint
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
 
+app.get('/test', (req, res) => {
+  const temp = { "temp": "its working" };
+  console.log(temp);
+  res.send(temp);
+});
+
+
 /*
 ========================================================================================================
 MAIN FUNCTIONS
