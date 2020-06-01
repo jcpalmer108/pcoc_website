@@ -17,8 +17,11 @@
 
 const settings = require('./settings.json');
 const express = require('express');
+const cors = require('cors')
 const app = express();
 const port = 3000;
+
+app.use(cors());
 
 const fetch = require('node-fetch');
 global.fetch = fetch;
