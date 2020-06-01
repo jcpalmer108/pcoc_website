@@ -17,11 +17,8 @@
 
 const settings = require('./settings.json');
 const express = require('express');
-const cors = require('cors')
 const app = express();
 const port = 3000;
-
-app.use(cors());
 
 const fetch = require('node-fetch');
 global.fetch = fetch;
@@ -34,6 +31,20 @@ var activeSessionData = {};
 END POINTS
 ========================================================================================================
 */
+
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, authorization',
+  );
+  res.header(
+    'Access-Control-Allow-Methods',
+    'PUT, POST, GET, DELETE, OPTIONS',
+  );
+  next();
+});
+
 app.get('/', () => console.log('This is working'));
 
 app.get('/device-code', async (req, res) => await generateDeviceCodeEndpoint(req, res));
