@@ -19,7 +19,6 @@ const settings = require('./settings.json');
 const express = require('express');
 const app = express();
 const port = 3000;
-const cors = require('cors');
 
 const fetch = require('node-fetch');
 global.fetch = fetch;
@@ -33,22 +32,11 @@ END POINTS
 ========================================================================================================
 */
 
-// const whitelist = ['*']
-// const corsOptions = {
-//   origin: function(origin, callback) {
-//     if (whitelist.indexOf(origin) !== -1) {
-//       callback(null, true)
-//     } else {
-//       callback(new Error('Not allowed by CORS'))
-//     }
-//   }
-// }
-
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header(
     'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept, authorization',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization',
   );
   res.header(
     'Access-Control-Allow-Methods',
@@ -56,8 +44,6 @@ app.use((req, res, next) => {
   );
   next();
 });
-
-app.options('*', cors());
 
 app.get('/', () => console.log('This is working'));
 
